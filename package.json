@@ -2,9 +2,12 @@
   "name": "@cinder-studio/cinder-graphql",
   "version": "1.0.0",
   "description": "GraphQL tools used by Cinder Studio. Open source for others who may want to use them.",
-  "main": "index.js",
+  "main": "lib/index.js",
   "scripts": {
-    "test": "./node_modules/.bin/jest"
+    "test": "./node_modules/.bin/jest",
+    "build": "rm -fr ./lib && tsc",
+    "verify": "npm run build && npm run test",
+    "install": "rm -fr ./lib && tsc"
   },
   "repository": {
     "type": "git",
