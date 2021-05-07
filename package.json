@@ -1,0 +1,71 @@
+{
+  "name": "@cinder-studio/cinder-graphql",
+  "version": "1.0.0",
+  "description": "GraphQL tools used by Cinder Studio. Open source for others who may want to use them.",
+  "main": "index.js",
+  "scripts": {
+    "test": "./node_modules/.bin/jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cinder-studio/cinder-graphql.git"
+  },
+  "keywords": [
+    "google",
+    "firestore",
+    "firebase",
+    "cloud"
+  ],
+  "author": "Cinder Studio Inc.",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/cinder-studio/cinder-graphql/issues"
+  },
+  "homepage": "https://github.com/cinder-studio/cinder-graphql#readme",
+  "dependencies": {
+    "@cinder-studio/quick-firestore": "github:cinder-studio/quick-firestore",
+    "axios": "^0.21.1",
+    "graphql": "^15.5.0",
+    "graphql-fields": "^2.0.3",
+    "graphql-type-long": "^0.1.1"
+  },
+  "devDependencies": {
+    "@types/jest": "^26.0.23",
+    "jest": "^26.6.3",
+    "ts-jest": "^26.5.6",
+    "tslint": "^6.1.3",
+    "typescript": "^4.2.4"
+  },
+  "jest": {
+    "verbose": true,
+    "rootDir": "./",
+    "testMatch": [
+      "**/?(*.)(spec|test).ts?(x)"
+    ],
+    "moduleDirectories": [
+      "node_modules",
+      "packages"
+    ],
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "jsx",
+      "json"
+    ],
+    "globals": {
+      "testFilesDir": "./_tests/"
+    },
+    "transform": {
+      "^.+\\.tsx?$": "ts-jest"
+    },
+    "coverageThreshold": {
+      "global": {
+        "branches": 12,
+        "functions": 7.5,
+        "lines": 12,
+        "statements": 11.3
+      }
+    }
+  }
+}

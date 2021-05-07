@@ -1,2 +1,6 @@
-# cinder-graphql
-GraphQL tools used by Cinder Studio. Open sourced for others who may want to use them.
+Cinder GraphQL
+==============
+
+GraphQL tools used by Cinder Studio. Open source for others who may want to use them.
+
+Incomplete Documentation
