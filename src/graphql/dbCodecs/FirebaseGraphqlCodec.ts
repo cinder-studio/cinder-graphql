@@ -220,17 +220,14 @@ export default class FirebaseGraphqlCodec {
     }
 
     public filterSelect = (fields:any) => {
-        const filter = []
         // filter inbound data to only approved keys
+        const filter = []
         for(const field of fields) {
-
             if(this.fieldNames.includes(field.fieldPath)) {
                 filter.push({...field})
             }
         }
-
         return filter
-
     }
 
     private sortFields(fields) {
