@@ -8,6 +8,8 @@ import {
 
 import * as graphqlFields from "graphql-fields"
 
+import FriendlyGqlError from "../../../FriendlyGqlError"
+
 import { Type_CreateMutationResult } from "../../../commonSchema"
 
 export const Type_BasicObject = new GraphQLObjectType({
@@ -56,7 +58,7 @@ export const Query_BasicObject = {
         ////////////////////
         ////////////////////
 ////////////////////
-        console.log('info', graphqlFields(info))
+        //console.log('info', graphqlFields(info))
 ////////////////////
         ////////////////////
         ////////////////////
@@ -105,5 +107,13 @@ export const Mutation_CreateBasicObject = {
         return {
             id: 'basicObj1ResultIdFromCreateMutation'
         }
+    }
+}
+
+export const Mutation_TestErrorHandling = {
+    type: GraphQLString,
+    args: {},
+    resolve: async (source, args, context, info) => {
+        throw new FriendlyGqlError('mock-friendly-error', "this error is a mock of a real error on the system")
     }
 }

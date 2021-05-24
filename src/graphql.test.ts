@@ -99,3 +99,20 @@ test("object based schema definition prints correctly", async () => {
 
     expect(1).toBe(1)
 })
+
+test("error throwing results in a reliable result that communicates to the client correctly", async () => {
+    const { schema } = compileGqlSchema({
+        query: {
+            testError: require('./_testTools/handlers/basic').Mutation_TestErrorHandling
+        }
+    })
+
+    const result = await executeGqlQuery(`
+        {
+            testError
+        }
+    `, schema, null, {})
+
+    expect(result.errors && result.errors.length === 1).toBe(true)
+    expect(result.errors[0].extensions.machineKey).toBe('mock-friendly-error')
+})
