@@ -19,6 +19,7 @@ const fbGqlCodec = new FirebaseGraphqlCodec({
         //normalMapField: { type: GraphQLString, isRequired:true, defaultValue: null, description: "normalMapField"},
         secretStringField: { type: GraphQLString, isRequired:false, isInternalOnly:true, defaultValue: null, description: "secretStringField"},
         secretAndRequiredStringField: { type: GraphQLString, isRequired:true, isInternalOnly:true, defaultValue: null, description: "secretStringField"},
+        defaultedRequiredField: { type: GraphQLString, isRequired:true, isInternalOnly:true, defaultValue: 'mock-default-value', description: "default required field"},
         //createViewableButUnstoreableStringField: {...} // DO NOT STORE THIS
         //calculatedButUnstoreableStringField: {...} // DO NOT STORE THIS
     }

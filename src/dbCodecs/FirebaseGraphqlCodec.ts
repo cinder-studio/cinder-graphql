@@ -169,14 +169,16 @@ const stripGqlNullability = (inFields:any, exposeInternalOnlyFields:boolean = fa
     return fieldsWithNullability
 }
 
-const verifyGqlRequired = (inArgs:any, inFields:any) => {
+const verifyGqlRequired = (inArgs:any, inFields:any, defaultValues:any) => {
     for(const fieldKey of Object.keys(inFields)) {
         if(inArgs[fieldKey] === undefined || inArgs[fieldKey] === null) {
             if(inFields[fieldKey].isRequired) {
-                return false
-            }
-            else {
-                inArgs[fieldKey] = null
+                if(defaultValues[fieldKey]) {
+                    inArgs[fieldKey] = defaultValues[fieldKey]
+                }
+                else {
+                    return false
+                }
             }
         }
     }
@@ -190,6 +192,7 @@ export default class FirebaseGraphqlCodec {
     private rVer: number
     private fields: IFieldsDictionary
     private fieldNames: string[]
+    private defaultValues: any
     public defaultReadReturnTypeConfig: any
     public defaultReadReturnType: any
 
@@ -203,6 +206,7 @@ export default class FirebaseGraphqlCodec {
 
         this.fields = sortedFields.sorted
         this.fieldNames = sortedFields.fieldNames
+        this.defaultValues = sortedFields.defaultValues
 
         this.defaultReadReturnTypeConfig = {
             name: this.displayShortname,
@@ -269,7 +273,9 @@ export default class FirebaseGraphqlCodec {
 
             // this ensures default-create for isInternalOnly fields (and non-null fields) honors the isRequired setting
             // isInternalOnly + isRequired === you must override the defaultResolve
-            if(!verifyGqlRequired(args, this.fields)) {
+// TODO better error handling
+            // this function also fills in default values when needed
+            if(!verifyGqlRequired(args, this.fields, this.defaultValues)) {
                 throw new Error('a required field is missing')
             }
 
