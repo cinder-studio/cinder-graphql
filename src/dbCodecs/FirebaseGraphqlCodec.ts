@@ -323,7 +323,7 @@ export default class FirebaseGraphqlCodec {
             // now run the update
             await context.quickFirestore.update(
                 this.collectionName,
-                args.id,
+                targetId,
                 {
                     ...args,
                     updatedAt: Date.now(),
