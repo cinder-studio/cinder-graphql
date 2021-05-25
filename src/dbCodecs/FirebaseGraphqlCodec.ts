@@ -317,7 +317,10 @@ export default class FirebaseGraphqlCodec {
 
         // override with options.overrideResolve
         const defaultResolve = async (source, args, context, info) => {
-
+            // don't update the actual id of the record. it's just an excessive dangerous write
+            const targetId = args.id
+            delete(args.id)
+            // now run the update
             await context.quickFirestore.update(
                 this.collectionName,
                 args.id,
@@ -327,7 +330,7 @@ export default class FirebaseGraphqlCodec {
                     rVer: this.rVer
                 }
             )
-
+            // return a standard representation from a normal update
             return {
                 id: args.id
             }
