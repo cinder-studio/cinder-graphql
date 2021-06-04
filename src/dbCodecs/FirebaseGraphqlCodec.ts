@@ -142,13 +142,18 @@ const enrichForOutput = (inFields:any, recursionDepth:number) => {
 const applyGqlNullability = (inFields:any, exposeInternalOnlyFields:boolean = false, stripFieldsBlockedForUpdate:boolean = false) => {
     const fieldsWithNullability = {}
     for(const fieldKey of Object.keys(inFields)) {
-        if(exposeInternalOnlyFields || inFields[fieldKey].isInternalOnly === undefined || !inFields[fieldKey].isInternalOnly) {
-            if(!stripFieldsBlockedForUpdate || !inFields[fieldKey].preventUpdate) {
-                fieldsWithNullability[fieldKey] = {
-                    type: !inFields[fieldKey].isRequired ? inFields[fieldKey].type : GraphQLNonNull(inFields[fieldKey].type),
-                    description: inFields[fieldKey].description
+        try {
+            if(exposeInternalOnlyFields || inFields[fieldKey].isInternalOnly === undefined || !inFields[fieldKey].isInternalOnly) {
+                if(!stripFieldsBlockedForUpdate || !inFields[fieldKey].preventUpdate) {
+                    fieldsWithNullability[fieldKey] = {
+                        type: !inFields[fieldKey].isRequired ? inFields[fieldKey].type : GraphQLNonNull(inFields[fieldKey].type),
+                        description: inFields[fieldKey].description
+                    }
                 }
             }
+        }
+        catch (e) {
+            throw new Error(`FirebaseGraphqlCodec had an error applying GQL Nullability: field:${fieldKey}`)
         }
     }
     return fieldsWithNullability
