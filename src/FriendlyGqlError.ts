@@ -21,7 +21,8 @@ import { GraphQLError } from "graphql"
 
 */
 class FriendlyGqlError extends GraphQLError{
-    constructor(machineKey:string, engineerMessage:string, originalError?:Error) {
+    constructor(machineKey:string, engineerMessage:string, metadata?:any, originalError?:Error) {
+        const addlMetadata = metadata ? metadata : {}
         super(
             engineerMessage,
             undefined,
@@ -30,7 +31,8 @@ class FriendlyGqlError extends GraphQLError{
             undefined,
             originalError,
             {
-                machineKey: machineKey
+                machineKey: machineKey,
+                ...addlMetadata
             }
         )
     }
