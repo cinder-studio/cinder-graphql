@@ -7,6 +7,51 @@ import { GraphQLLong } from "../../../commonSchema"
 
 import FirebaseGraphqlCodec from "../../../dbCodecs/FirebaseGraphqlCodec"
 
+const TypeConfigMock = {
+    name: 'TypeObjConfigMock',
+    description: 'TypeObjConfigMock',
+    fields: {
+        mockFieldOneRequired: {
+            type: GraphQLString,
+            description: "mockFieldOneRequired" ,
+            isRequired: true,
+            preventUpdate: false,
+        }
+    }
+}
+
+const TypeConfigSubMock = {
+    name: 'TypeObjConfigSubMock',
+    description: 'TypeObjConfigSubMock',
+    fields: {
+        mockFieldOneRequired: {
+            type: GraphQLString,
+            description: "mockFieldOneRequired" ,
+            isRequired: true,
+            preventUpdate: false,
+        }
+    }
+}
+
+const TypeListConfigMock = {
+    name: 'TypeListObjConfigMock',
+    description: 'TypeListObjConfigMock',
+    fields: {
+        mockFieldObjOneRequired: {
+            typeObjectConfig: TypeConfigSubMock,
+            description: "mockFieldObjOneRequired" ,
+            isRequired: true,
+            preventUpdate: false,
+        },
+        mockFieldTwoRequired: {
+            type: GraphQLString,
+            description: "mockFieldTwoRequired" ,
+            isRequired: true,
+            preventUpdate: false,
+        }
+    }
+}
+
 const fbGqlCodec = new FirebaseGraphqlCodec({
     displayShortname: 'MockGqlCodec',
     collectionName: 'MockGqlCodec',
@@ -15,13 +60,14 @@ const fbGqlCodec = new FirebaseGraphqlCodec({
     fields: {
         normalStringField: { type: GraphQLString, isRequired:true, defaultValue: null, description: "normalStringField"},
         normalNumberField: { type: GraphQLLong, isRequired:true, defaultValue: null, description: "normalNumberField"},
-        //normalArrayField: { type: GraphQLString, isRequired:true, defaultValue: null, description: "normalArrayField"},
         //normalMapField: { type: GraphQLString, isRequired:true, defaultValue: null, description: "normalMapField"},
         secretStringField: { type: GraphQLString, isRequired:false, isInternalOnly:true, defaultValue: null, description: "secretStringField"},
         secretAndRequiredStringField: { type: GraphQLString, isRequired:true, isInternalOnly:true, defaultValue: null, description: "secretStringField"},
         defaultedRequiredField: { type: GraphQLString, isRequired:true, isInternalOnly:true, defaultValue: 'mock-default-value', description: "default required field"},
         //createViewableButUnstoreableStringField: {...} // DO NOT STORE THIS
         //calculatedButUnstoreableStringField: {...} // DO NOT STORE THIS
+//TODO test this        //normalObjField: { typeObjectConfig: TypeConfigMock, isRequired:true, defaultValue: null, description: "normalObjField"},
+//TODO test this        //normalArrayObjField: { typeListOfObjectConfigs: TypeListConfigMock, isRequired:true, defaultValue: null, description: "normalArrayObjField"},
     }
 })
 

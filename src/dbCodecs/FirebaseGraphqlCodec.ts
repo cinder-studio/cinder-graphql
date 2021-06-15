@@ -23,6 +23,7 @@ import {
 interface IField {
     type?: any,
     typeObjectConfig?: any,
+    typeListOfObjectConfigs?: any,
     isRequired: boolean,
     isInternalOnly?: boolean,
     preventUpdate?: boolean,
@@ -104,7 +105,7 @@ const enrichForInput = (inFields:any, opName:string, recursionDepth:number) => {
             ///-- recursive --///
             const resolvedConfig = {
                 ...currentField.typeListOfObjectConfigs,
-                fields: enrichForInput(currentField.typeObjectConfig.fields, opName, recursionDepth + 1)
+                fields: enrichForInput(currentField.typeListOfObjectConfigs.fields, opName, recursionDepth + 1)
             }
             ///-- end-recursive --///
 
@@ -161,8 +162,8 @@ const enrichForOutput = (inFields:any, recursionDepth:number) => {
 
             ///-- recursive --///
             const resolvedConfig = {
-                ...currentField.typeObjectConfig,
-                fields: enrichForOutput(currentField.typeObjectConfig.fields, recursionDepth + 1)
+                ...currentField.typeListOfObjectConfigs,
+                fields: enrichForOutput(currentField.typeListOfObjectConfigs.fields, recursionDepth + 1)
             }
             ///-- end-recursive --///
 
