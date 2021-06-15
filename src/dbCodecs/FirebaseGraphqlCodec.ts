@@ -99,6 +99,31 @@ const enrichForInput = (inFields:any, opName:string, recursionDepth:number) => {
             }
 
         }
+        else if(currentField.typeListOfObjectConfigs) {
+
+            ///-- recursive --///
+            const resolvedConfig = {
+                ...currentField.typeListOfObjectConfigs,
+                fields: enrichForInput(currentField.typeObjectConfig.fields, opName, recursionDepth + 1)
+            }
+            ///-- end-recursive --///
+
+            let enrichedFieldType:any = new GraphQLInputObjectType({
+                ...resolvedConfig,
+                name: `${resolvedConfig.name}${opName}Input`
+            })
+
+            // isRequired
+            if(currentField.isRequired && recursionDepth > 0) {
+                enrichedFieldType = new GraphQLNonNull(enrichedFieldType)
+            }
+
+            enrichedFields[fieldKey] = {
+                ...currentField,
+                type: GraphQLList(enrichedFieldType)
+            }
+
+        }
         else {
             enrichedFields[fieldKey] = currentField
         }
@@ -129,6 +154,28 @@ const enrichForOutput = (inFields:any, recursionDepth:number) => {
             enrichedFields[fieldKey] = {
                 ...currentField,
                 type: enrichedFieldType
+            }
+
+        }
+        else if(currentField.typeListOfObjectConfigs) {
+
+            ///-- recursive --///
+            const resolvedConfig = {
+                ...currentField.typeObjectConfig,
+                fields: enrichForOutput(currentField.typeObjectConfig.fields, recursionDepth + 1)
+            }
+            ///-- end-recursive --///
+
+            let enrichedFieldType:any = new GraphQLObjectType(resolvedConfig)
+
+            // isRequired
+            if(currentField.isRequired && recursionDepth > 0) {
+                enrichedFieldType = new GraphQLNonNull(enrichedFieldType)
+            }
+
+            enrichedFields[fieldKey] = {
+                ...currentField,
+                type: GraphQLList(enrichedFieldType)
             }
 
         }
