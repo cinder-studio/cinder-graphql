@@ -497,9 +497,12 @@ export default class FirebaseGraphqlCodec {
                 .whereComposite('deletedAt', 'IS_NULL')
                 .prepare()
             )
-
+            if(!result) {
+                return result
+            }
             return {
                 ...result,
+// TODO support cursors
                 cursor: null
             }
         }
