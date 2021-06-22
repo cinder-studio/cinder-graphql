@@ -24,11 +24,12 @@ interface IField {
     type?: any,
     typeObjectConfig?: any,
     typeListOfObjectConfigs?: any,
+    description: string,
     isRequired: boolean,
     isInternalOnly?: boolean,
+    isReadOnly?: boolean,
     preventUpdate?: boolean,
     defaultValue: any,
-    description: string
 }
 
 interface IFieldsDictionary {
@@ -71,6 +72,18 @@ interface IOrderBy {
     type: string
 }
 
+/*
+    This is a recursive function that loops down an object tree and converts each
+    object configuration into an actual GraphQLInputObjectType. Given that every
+    object it creates is an Input , it names every field with a postfix of "Input".
+
+    It also applies nullability at the deeper levels of the object tree while
+    ignoring nullability at the top level. Reserving that configuration for
+    another function.
+
+    This function also preserves other internal configuration fields for further
+    configuration changes at the next step.
+*/
 const enrichForInput = (inFields:any, opName:string, recursionDepth:number) => {
     const enrichedFields = {}
     for(const fieldKey of Object.keys(inFields)) {
@@ -132,6 +145,18 @@ const enrichForInput = (inFields:any, opName:string, recursionDepth:number) => {
     return enrichedFields
 }
 
+/*
+    This is a recursive function that loops down an object tree and converts each
+    object configuration into an actual GraphQLObjectType. It has no impact on the
+    name of the objects. It honors the name provided.
+
+    It also applies nullability at the deeper levels of the object tree while
+    ignoring nullability at the top level. Reserving that configuration for
+    another function.
+
+    This function also preserves other internal configuration fields for further
+    configuration changes at the next step.
+*/
 const enrichForOutput = (inFields:any, recursionDepth:number) => {
     const enrichedFields = {}
     for(const fieldKey of Object.keys(inFields)) {
@@ -187,46 +212,43 @@ const enrichForOutput = (inFields:any, recursionDepth:number) => {
     return enrichedFields
 }
 
-const applyGqlNullability = (inFields:any, exposeInternalOnlyFields:boolean = false, stripFieldsBlockedForUpdate:boolean = false) => {
-    const fieldsWithNullability = {}
-    for(const fieldKey of Object.keys(inFields)) {
-        try {
-            if(exposeInternalOnlyFields || inFields[fieldKey].isInternalOnly === undefined || !inFields[fieldKey].isInternalOnly) {
-                if(!stripFieldsBlockedForUpdate || !inFields[fieldKey].preventUpdate) {
-                    fieldsWithNullability[fieldKey] = {
-                        type: !inFields[fieldKey].isRequired ? inFields[fieldKey].type : GraphQLNonNull(inFields[fieldKey].type),
-                        description: inFields[fieldKey].description
-                    }
-                }
-            }
-        }
-        catch (e) {
-            console.error(e)
-            throw new Error(`FirebaseGraphqlCodec had an error applying GQL Nullability: field:${fieldKey}`)
-        }
-    }
-    return fieldsWithNullability
+/**
+    Apply restrictions on each field depending on the read or write model of the
+    api the object is intended for.
+*/
+interface IFieldAlterationOptions {
+    enforceRequired:boolean
+    hideInternalOnly:boolean
+    hideReadOnly:boolean
+    hidePreventUpdate:boolean
 }
-
-const stripGqlNullability = (inFields:any, exposeInternalOnlyFields:boolean = false, stripFieldsBlockedForUpdate:boolean = false) => {
-    const fieldsWithNullability = {}
-    for(const fieldKey of Object.keys(inFields)) {
+const applyFieldAlterations = ( inFieldsMap:any, options:IFieldAlterationOptions ) => {
+    const fieldsToReturn = {}
+    for(const fieldKey of Object.keys(inFieldsMap)) {
         try {
-            if(exposeInternalOnlyFields || inFields[fieldKey].isInternalOnly === undefined || !inFields[fieldKey].isInternalOnly) {
-                if(!stripFieldsBlockedForUpdate || !inFields[fieldKey].preventUpdate) {
-                    fieldsWithNullability[fieldKey] = {
-                        type: inFields[fieldKey].type,
-                        description: inFields[fieldKey].description
-                    }
-                }
+            let currentField = inFieldsMap[fieldKey]
+            // filters
+            if(options.hideInternalOnly && currentField.isInternalOnly) {
+                continue
+            }
+            if(options.hideReadOnly && currentField.isReadOnly) {
+                continue
+            }
+            if(options.hidePreventUpdate && currentField.preventUpdate) {
+                continue
+            }
+            //and write
+            fieldsToReturn[fieldKey] = {
+                type: (options.enforceRequired && currentField.isRequired) ? GraphQLNonNull(currentField.type) : currentField.type,
+                description: currentField.description
             }
         }
         catch (e) {
             console.error(e)
-            throw new Error(`FirebaseGraphqlCodec had an error stripping GQL Nullability: field:${fieldKey}`)
+            throw new Error(`FirebaseGraphqlCodec had an error applying GQL field alterations: field:${fieldKey}`)
         }
     }
-    return fieldsWithNullability
+    return fieldsToReturn
 }
 
 const verifyGqlRequired = (inArgs:any, inFields:any, defaultValues:any) => {
@@ -276,7 +298,12 @@ export default class FirebaseGraphqlCodec {
                 // when a read or list function views this record,
                 // gql will need to be able to indicate if a field is nullable
                 // so we are recording that value now for read and list outputs.
-                ...applyGqlNullability(enrichForOutput(this.fields, 0)),
+                ...applyFieldAlterations(enrichForOutput(this.fields, 0), {
+                    enforceRequired:true,
+                    hideInternalOnly:true,
+                    hideReadOnly:false,
+                    hidePreventUpdate:false,
+                }),
                 cursor: { type: GraphQLString, description: "This field will be returned when the object is obtained using a cursor-based list query" }
             }
         }
@@ -323,7 +350,12 @@ export default class FirebaseGraphqlCodec {
             //    ...Interface_IDatabaseRecord_ApiFields,
             // graphql has it's own method of describing nullability, we need it
             // to know that data and honor it during a standard CREATE operation.
-            ...applyGqlNullability(enrichForInput(this.fields,'Create', 0))
+            ...applyFieldAlterations(enrichForInput(this.fields,'Create', 0), {
+                enforceRequired:true,
+                hideInternalOnly:true,
+                hideReadOnly:true,
+                hidePreventUpdate:false,
+            }),
         }
 
         // override with options.overrideResolve
@@ -372,7 +404,12 @@ export default class FirebaseGraphqlCodec {
             // in the case of a standard update scenario, you should
             // be able to choose to update any field you want,
             // BUT NOT REQUIRED TO UPDATE IT
-            ...stripGqlNullability(enrichForInput(this.fields,'Update', 0), false, true)
+            ...applyFieldAlterations(enrichForInput(this.fields,'Update', 0), {
+                enforceRequired:false,
+                hideInternalOnly:true,
+                hideReadOnly:true,
+                hidePreventUpdate:true,
+            }),
         }
 
         // override with options.overrideResolve
@@ -438,6 +475,10 @@ export default class FirebaseGraphqlCodec {
     }
 
     public readOneCodec = (options:ICodecOptions) => {
+
+// TODO
+// TODO read one codec should use the firebase read capability, not the query capability
+// TODO
 
         // override with options.overrideType
         const defaultReturnType = this.defaultReadReturnType
