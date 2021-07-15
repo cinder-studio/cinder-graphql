@@ -7,9 +7,10 @@
   "scripts": {
     "test": "./node_modules/.bin/jest",
     "build": "rm -fr ./lib && tsc",
+    "lint": "tslint --project tsconfig.json",
     "prepare": "npm run build",
-    "prepublishOnly": "npm test",
-    "preversion": "npm run lint && npm run lint",
+    "prepublishOnly": "npm test && npm run lint",
+    "preversion": "npm run lint",
     "version": "git add -A src",
     "postversion": "git push && git push --tags",
     "verify": "npm run build && npm run test"
