@@ -1,6 +1,6 @@
 {
   "name": "@cinder-studio/cinder-graphql",
-  "version": "0.8.2",
+  "version": "0.9.0",
   "description": "GraphQL tools used by Cinder Studio. Open source for others who may want to use them.",
   "main": "lib/index.js",
   "scripts": {
