@@ -30,7 +30,7 @@
   },
   "homepage": "https://github.com/cinder-studio/cinder-graphql#readme",
   "dependencies": {
-    "@cinder-studio/quick-firestore": "^0.8.6",
+    "@cinder-studio/quick-firestore": "^0.8.8",
     "axios": "^0.21.1",
     "graphql": "^15.5.0",
     "graphql-fields": "^2.0.3",
