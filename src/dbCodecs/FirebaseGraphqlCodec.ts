@@ -339,6 +339,18 @@ export default class FirebaseGraphqlCodec {
         }
     }
 
+//TODO expirimental
+//TODO test and convert 'createOneCodec' to use this function
+    public prepareCreateObject = (objToCreate:any, quickFirestore:any, overrideId?:string) => {
+        const objPrepared = {...objToCreate} // TODO deep copy?
+        if(!verifyGqlRequired(objPrepared, this.fields, this.defaultValues)) {
+            throw new Error('a required field is missing')
+        }
+        const documentId = overrideId ? overrideId : quickFirestore.config.overrideIdCreator()
+        // transform /enforce create data format
+        return quickFirestore.config.overrideCreateTransform(objPrepared, documentId)
+    }
+
     public createOneCodec = (options:ICodecOptions) => {
 
         // override with options.overrideType
