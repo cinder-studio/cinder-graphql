@@ -11,7 +11,10 @@
     "prepublishOnly": "npm test",
     "version": "git add -A src",
     "postversion": "git push && git push --tags",
-    "verify": "npm run build && npm run test"
+    "verify": "npm run build && npm run test",
+    "deploy-patch": "npm version patch",
+    "deploy-minor": "npm version minor",
+    "deploy-major": "npm version major"
   },
   "repository": {
     "type": "git",
