@@ -52,6 +52,7 @@ interface ITypeDef {
 
 interface ICodecOptions {
     description: string
+    customValidator?: (args:any, context:any) => boolean
     overrideType?: (defaultReturnTypeConfig:ITypeDef) => ITypeDef
     overrideArgs?: (defaultArgsList:any) => any // id prefer the input be IField[] but it does not like me getting fancy with inputs
     overrideResolve?: (defaultFn:any) => any
@@ -379,6 +380,12 @@ export default class FirebaseGraphqlCodec {
             // isInternalOnly + isRequired === you must override the defaultResolve
 // TODO better error handling
             // this function also fills in default values when needed
+
+            // custom validator
+            if(options.customValidator && !options.customValidator(args, context)) {
+                throw new Error('unexpected error validating this call') // will only be called if the validator function does not return true or an error
+            }
+
             if(!verifyGqlRequired(args, this.fields, this.defaultValues)) {
                 throw new Error('a required field is missing')
             }
@@ -426,6 +433,11 @@ export default class FirebaseGraphqlCodec {
 
         // override with options.overrideResolve
         const defaultResolve = async (source, args, context, info) => {
+            // custom validator
+            if(options.customValidator && !options.customValidator(args, context)) {
+                throw new Error('unexpected error validating this call') // will only be called if the validator function does not return true or an error
+            }
+
             // don't update the actual id of the record. it's just an excessive dangerous write
             const targetId = `${args.id}`
             delete(args.id)
@@ -465,6 +477,12 @@ export default class FirebaseGraphqlCodec {
 
         // override with options.overrideResolve
         const defaultResolve = async (source, args, context, info) => {
+            // custom validator
+            if(options.customValidator && !options.customValidator(args, context)) {
+                throw new Error('unexpected error validating this call') // will only be called if the validator function does not return true or an error
+            }
+
+            // run the delete query
             const result =  await context.quickFirestore.update(
                 this.collectionName,
                 args.id,
@@ -502,6 +520,12 @@ export default class FirebaseGraphqlCodec {
 
         // override with options.overrideResolve
         const defaultResolve = async (source, args, context, info) => {
+            // custom validator
+            if(options.customValidator && !options.customValidator(args, context)) {
+                throw new Error('unexpected error validating this call') // will only be called if the validator function does not return true or an error
+            }
+
+            // run the query
             const result = await context.quickFirestore.queryOne(
                 this.collection()
                 .selectWithCommonFields(...this.fieldNames)
@@ -539,6 +563,11 @@ export default class FirebaseGraphqlCodec {
 
         // override with options.overrideResolve
         const defaultResolve = async (source, args, context, info) => {
+            // custom validator
+            if(options.customValidator && !options.customValidator(args, context)) {
+                throw new Error('unexpected error validating this call') // will only be called if the validator function does not return true or an error
+            }
+
             const query = this.collection().select(...this.fieldNames).whereComposite('deletedAt', 'IS_NULL').limit(options.defaultListLimit)
 
             for(const order of options.orderListBy) {
@@ -611,6 +640,11 @@ export default class FirebaseGraphqlCodec {
 
         // the resolve
         const trueResolve = async (source, args, context, info) => {
+            // custom validator
+            if(options.customValidator && !options.customValidator(args, context)) {
+                throw new Error('unexpected error validating this call') // will only be called if the validator function does not return true or an error
+            }
+            // call the custom resolve
             const resolveResults = await options.customResolve(context.quickFirestore, this.collection(), source, args, context, info)
             return resolveResults
         }
