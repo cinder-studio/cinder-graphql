@@ -381,11 +381,6 @@ export default class FirebaseGraphqlCodec {
 // TODO better error handling
             // this function also fills in default values when needed
 
-            // custom validator
-            if(options.customValidator && !options.customValidator(args, context)) {
-                throw new Error('unexpected error validating this call') // will only be called if the validator function does not return true or an error
-            }
-
             if(!verifyGqlRequired(args, this.fields, this.defaultValues)) {
                 throw new Error('a required field is missing')
             }
@@ -402,11 +397,22 @@ export default class FirebaseGraphqlCodec {
             //TODO: Evaluate Better Error Handling
         }
 
+        // REVIEWED: review concludes that the customValidator will always run at the correct time. This implementation is valid.
+        const trueResolve = async (source, args, context, info) => {
+            // custom validator
+            if(options.customValidator && !options.customValidator(args, context)) {
+                throw new Error('unexpected error validating this call') // will only be called if the validator function does not return true or an error
+            }
+            // resolve
+            const targetResolver = (!options.overrideResolve ? defaultResolve : options.overrideResolve(defaultResolve))
+            return targetResolver(source, args, context, info)
+        }
+
         return {
             description: options.description,
             type: (!options.overrideType ? defaultReturnType : new GraphQLObjectType( options.overrideType({...Type_CreateMutationResultConfig, fields:{...Type_CreateMutationResultConfig.fields}}))),
             args: (!options.overrideArgs ? defaultArgs : options.overrideArgs({...defaultArgs})),
-            resolve: (!options.overrideResolve ? defaultResolve : options.overrideResolve(defaultResolve))
+            resolve: trueResolve
         }
     }
 
@@ -433,11 +439,6 @@ export default class FirebaseGraphqlCodec {
 
         // override with options.overrideResolve
         const defaultResolve = async (source, args, context, info) => {
-            // custom validator
-            if(options.customValidator && !options.customValidator(args, context)) {
-                throw new Error('unexpected error validating this call') // will only be called if the validator function does not return true or an error
-            }
-
             // don't update the actual id of the record. it's just an excessive dangerous write
             const targetId = `${args.id}`
             delete(args.id)
@@ -457,11 +458,22 @@ export default class FirebaseGraphqlCodec {
             }
         }
 
+        // REVIEWED: review concludes that the customValidator will always run at the correct time. This implementation is valid.
+        const trueResolve = async (source, args, context, info) => {
+            // custom validator
+            if(options.customValidator && !options.customValidator(args, context)) {
+                throw new Error('unexpected error validating this call') // will only be called if the validator function does not return true or an error
+            }
+            // resolve
+            const targetResolver = (!options.overrideResolve ? defaultResolve : options.overrideResolve(defaultResolve))
+            return targetResolver(source, args, context, info)
+        }
+
         return {
             description: options.description,
             type: (!options.overrideType ? defaultReturnType : new GraphQLObjectType( options.overrideType({...Type_UpdateMutationResultConfig, fields:{...Type_UpdateMutationResultConfig.fields}}))),
             args: (!options.overrideArgs ? defaultArgs : options.overrideArgs({...defaultArgs})),
-            resolve: (!options.overrideResolve ? defaultResolve : options.overrideResolve(defaultResolve))
+            resolve: trueResolve
         }
     }
 
@@ -477,11 +489,6 @@ export default class FirebaseGraphqlCodec {
 
         // override with options.overrideResolve
         const defaultResolve = async (source, args, context, info) => {
-            // custom validator
-            if(options.customValidator && !options.customValidator(args, context)) {
-                throw new Error('unexpected error validating this call') // will only be called if the validator function does not return true or an error
-            }
-
             // run the delete query
             const result =  await context.quickFirestore.update(
                 this.collectionName,
@@ -496,11 +503,22 @@ export default class FirebaseGraphqlCodec {
             }
         }
 
+        // REVIEWED: review concludes that the customValidator will always run at the correct time. This implementation is valid.
+        const trueResolve = async (source, args, context, info) => {
+            // custom validator
+            if(options.customValidator && !options.customValidator(args, context)) {
+                throw new Error('unexpected error validating this call') // will only be called if the validator function does not return true or an error
+            }
+            // resolve
+            const targetResolver = (!options.overrideResolve ? defaultResolve : options.overrideResolve(defaultResolve))
+            return targetResolver(source, args, context, info)
+        }
+
         return {
             description: options.description,
             type: (!options.overrideType ? defaultReturnType : new GraphQLObjectType( options.overrideType({...Type_DeleteMutationResultConfig, fields:{...Type_DeleteMutationResultConfig.fields}}))),
             args: (!options.overrideArgs ? defaultArgs : options.overrideArgs({...defaultArgs})),
-            resolve: (!options.overrideResolve ? defaultResolve : options.overrideResolve(defaultResolve))
+            resolve: trueResolve
         }
     }
 
@@ -520,11 +538,6 @@ export default class FirebaseGraphqlCodec {
 
         // override with options.overrideResolve
         const defaultResolve = async (source, args, context, info) => {
-            // custom validator
-            if(options.customValidator && !options.customValidator(args, context)) {
-                throw new Error('unexpected error validating this call') // will only be called if the validator function does not return true or an error
-            }
-
             // run the query
             const result = await context.quickFirestore.queryOne(
                 this.collection()
@@ -543,11 +556,22 @@ export default class FirebaseGraphqlCodec {
             }
         }
 
+        // REVIEWED: review concludes that the customValidator will always run at the correct time. This implementation is valid.
+        const trueResolve = async (source, args, context, info) => {
+            // custom validator
+            if(options.customValidator && !options.customValidator(args, context)) {
+                throw new Error('unexpected error validating this call') // will only be called if the validator function does not return true or an error
+            }
+            // resolve
+            const targetResolver = (!options.overrideResolve ? defaultResolve : options.overrideResolve(defaultResolve))
+            return targetResolver(source, args, context, info)
+        }
+
         return {
             description: options.description,
             type: (!options.overrideType ? defaultReturnType : new GraphQLObjectType( options.overrideType({...this.defaultReadReturnTypeConfig, fields:{...this.defaultReadReturnTypeConfig.fields}}))),
             args: (!options.overrideArgs ? defaultArgs : options.overrideArgs({...defaultArgs})),
-            resolve: (!options.overrideResolve ? defaultResolve : options.overrideResolve(defaultResolve))
+            resolve: trueResolve
         }
     }
 
@@ -563,11 +587,6 @@ export default class FirebaseGraphqlCodec {
 
         // override with options.overrideResolve
         const defaultResolve = async (source, args, context, info) => {
-            // custom validator
-            if(options.customValidator && !options.customValidator(args, context)) {
-                throw new Error('unexpected error validating this call') // will only be called if the validator function does not return true or an error
-            }
-
             const query = this.collection().select(...this.fieldNames).whereComposite('deletedAt', 'IS_NULL').limit(options.defaultListLimit)
 
             for(const order of options.orderListBy) {
@@ -609,6 +628,17 @@ export default class FirebaseGraphqlCodec {
             return mappedResults
         }
 
+        // REVIEWED: review concludes that the customValidator will always run at the correct time. This implementation is valid.
+        const trueResolve = async (source, args, context, info) => {
+            // custom validator
+            if(options.customValidator && !options.customValidator(args, context)) {
+                throw new Error('unexpected error validating this call') // will only be called if the validator function does not return true or an error
+            }
+            // resolve
+            const targetResolver = (!options.overrideResolve ? defaultResolve : options.overrideResolve(defaultResolve))
+            return targetResolver(source, args, context, info)
+        }
+
         return {
             description: options.description,
             type: new GraphQLList(
@@ -621,7 +651,7 @@ export default class FirebaseGraphqlCodec {
                 )
             ),
             args: (!options.overrideArgs ? defaultArgs : options.overrideArgs({...defaultArgs})),
-            resolve: (!options.overrideResolve ? defaultResolve : options.overrideResolve(defaultResolve))
+            resolve: trueResolve
         }
     }
 
@@ -639,6 +669,7 @@ export default class FirebaseGraphqlCodec {
         const defaultArgs = {}
 
         // the resolve
+        // REVIEWED: review concludes that the customValidator will always run at the correct time. This implementation is valid.
         const trueResolve = async (source, args, context, info) => {
             // custom validator
             if(options.customValidator && !options.customValidator(args, context)) {

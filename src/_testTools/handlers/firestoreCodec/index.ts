@@ -52,7 +52,7 @@ const TypeListConfigMock = {
     }
 }
 
-const fbGqlCodec = new FirebaseGraphqlCodec({
+export const fbGqlCodec = new FirebaseGraphqlCodec({
     displayShortname: 'MockGqlCodec',
     collectionName: 'MockGqlCodec',
     description: 'A Mock Description',
