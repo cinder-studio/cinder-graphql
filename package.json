@@ -34,11 +34,13 @@
   },
   "homepage": "https://github.com/cinder-studio/cinder-graphql#readme",
   "dependencies": {
-    "@cinder-studio/quick-firestore": "^0.10.1",
+    "@cinder-studio/quick-firestore": "^1.0.0",
     "axios": "^0.21.1",
-    "graphql": "^15.5.0",
+    "graphql": "15.8",
     "graphql-fields": "^2.0.3",
-    "graphql-type-long": "^0.1.1"
+    "graphql-type-long": "github:cinder-studio/graphql-type-long",
+    "install": "^0.13.0",
+    "npm": "^8.8.0"
   },
   "devDependencies": {
     "@types/jest": "^27.0.2",
