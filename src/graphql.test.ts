@@ -1,5 +1,12 @@
 import compileGqlSchema from "./compileGqlSchema"
 import executeGqlQuery from "./executeGqlQuery"
+import { GraphQLLong } from "./commonSchema"
+
+test("verify GraphQLLong imports correctly", async() => {
+    expect(GraphQLLong).not.toBe(null)
+    expect(GraphQLLong).not.toBe(undefined)
+    expect(Object.prototype.toString.call(GraphQLLong)).toBe('[object GraphQLScalarType]')
+})
 
 test("execute basic standard gql queries using object based schema", async () => {
     const { schema } = compileGqlSchema({
