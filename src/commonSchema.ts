@@ -5,7 +5,7 @@ import {
     GraphQLString
 } from "graphql"
 
-import * as GQLLong from "graphql-type-long"
+import * as GQLLong from "./GraphQLLong"
 export const GraphQLLong = GQLLong
 
 export const Type_CreateMutationResultConfig = {
