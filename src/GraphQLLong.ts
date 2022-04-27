@@ -69,4 +69,4 @@ GraphQLLong = new GraphQLScalarType({
   parseLiteral: parseLiteral
 });
 
-module.exports = GraphQLLong;
+export default GraphQLLong;
